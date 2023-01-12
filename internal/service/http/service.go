@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/hyphengolang/flyio/internal/common"
@@ -38,8 +39,14 @@ func (s *service) handleRoot() http.HandlerFunc {
 		} `json:"meta"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		// get Name from request url query
+		name := r.URL.Query().Get("name")
+		if name == "" {
+			name = "World"
+		}
+
 		v := response{
-			Message: "hello world",
+			Message: fmt.Sprintf("Hello %s!", name),
 			Meta: struct {
 				Hostname  string `json:"hostname"`
 				IPAddress string `json:"ipAddress"`

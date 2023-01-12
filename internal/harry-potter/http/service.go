@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"time"
 
 	router "github.com/hyphengolang/flyio/internal/http"
 )
@@ -53,8 +54,32 @@ func (s *service) handleGet() http.HandlerFunc {
 }
 
 func (s *service) handleCreate() http.HandlerFunc {
+	type request struct {
+		Name    string     `json:"name"`
+		Blood   string     `json:"blood"`
+		Species string     `json:"species"`
+		Born    *time.Time `json:"born"`
+		Quote   string     `json:"quote"`
+		ImgURL  string     `json:"imgUrl"`
+	}
+
+	decode := func(w http.ResponseWriter, r *http.Request, character any) error {
+		var req request
+		if err := s.mux.Decode(w, r, &req); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.mux.Respond(w, r, "create character", http.StatusNotImplemented)
+		var c any
+		if err := decode(w, r, c); err != nil {
+			s.mux.Respond(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		s.mux.Respond(w, r, "create character", http.StatusOK)
 	}
 }
 
