@@ -15,6 +15,7 @@ func (s *service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
+// Handle's default routes
 func NewService() http.Handler {
 	s := &service{
 		mux: router.NewRouter(),
@@ -24,7 +25,7 @@ func NewService() http.Handler {
 }
 
 func (s *service) routes() {
-	s.mux.Get("/", s.handleRoot())
+	s.mux.Get("/*", s.handleRoot())
 
 }
 
