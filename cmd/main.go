@@ -6,7 +6,8 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	// hpSrv "github.com/hyphengolang/flyio/internal/harry-potter/http"
+
+	hpSrv "github.com/hyphengolang/flyio/internal/harry-potter/http"
 	baseSrv "github.com/hyphengolang/flyio/internal/service/http"
 )
 
@@ -20,10 +21,9 @@ func init() {
 }
 
 func main() {
-	// default
 	mux := chi.NewRouter()
 	mux.Mount("/", baseSrv.NewService())
-	// mux.Mount("/characters", hpSrv.NewService())
+	mux.Mount("/characters", hpSrv.NewService())
 
 	log.Println("Listening on port", port)
 	log.Fatalln(http.ListenAndServe(":"+port, mux))

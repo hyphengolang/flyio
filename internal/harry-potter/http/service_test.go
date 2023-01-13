@@ -1,6 +1,7 @@
 package http_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -44,12 +45,26 @@ func TestService(t *testing.T) {
 		res, err := http.Post(srv.URL+"/characters", "application/json", strings.NewReader(payload))
 		is.NoErr(err)                                // no request error
 		is.Equal(res.StatusCode, http.StatusCreated) // post character
+		loc := res.Header.Get("Location")
+		is.True(loc != "") // URL+"/characters/"+id
 	})
 
 	t.Run("get all characters", func(t *testing.T) {
 		res, err := http.Get(srv.URL + "/characters")
-		is.NoErr(err) // no request error
-
+		is.NoErr(err)                           // no request error
 		is.Equal(res.StatusCode, http.StatusOK) // get all characters
+		defer res.Body.Close()
+
+		type body struct {
+			Characters []struct {
+				ID   string `json:"id"`
+				Name string `json:"name"`
+			} `json:"characters"`
+		}
+
+		var b body
+		is.NoErr(json.NewDecoder(res.Body).Decode(&b)) // decode response body
+		is.True(len(b.Characters) > 0)                 // at least one character
+		is.Equal(b.Characters[0].Name, "Harry Potter") // first character is harry potter
 	})
 }

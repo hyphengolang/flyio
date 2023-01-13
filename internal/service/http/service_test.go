@@ -27,9 +27,6 @@ func TestService(t *testing.T) {
 
 	t.Cleanup(func() { srv.Close() })
 
-	//NOTE - Date obj in JS The string format should be: YYYY-MM-DDTHH:mm:ss.sssZ
-	// Also accepts YYYY-MM or YYYY
-
 	t.Run("make a get request with Name query", func(t *testing.T) {
 		res, err := srv.Client().Get(srv.URL + "/?name=John")
 		is.NoErr(err)                           // no request error

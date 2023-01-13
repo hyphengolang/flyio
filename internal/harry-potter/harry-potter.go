@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
+	intern "github.com/hyphengolang/flyio/internal"
 )
 
 var ErrInvalidTyp = errors.New("harry-potter: invalid type")
 
 type Character struct {
-	ID      uuid.UUID  `json:"id"`
-	Name    string     `json:"name"`
-	Blood   BloodTyp   `json:"blood"`
-	Species SpeciesTyp `json:"species"`
-	Born    *time.Time `json:"born"`
-	Quote   string     `json:"quote"`
-	ImgURL  *url.URL   `json:"imgUrl"`
+	ID      uuid.UUID    `json:"id"`
+	Name    string       `json:"name"`
+	Blood   BloodTyp     `json:"blood"`
+	Species SpeciesTyp   `json:"species"`
+	Born    *intern.Time `json:"born"`
+	Quote   string       `json:"quote"`
+	ImgURL  *url.URL     `json:"imgUrl"`
 }
 
 func (c Character) String() string {
@@ -53,6 +53,16 @@ func ParseBloodTyp(s string) (BloodTyp, error) {
 	return -1, fmt.Errorf("%w: blood type of %s not allowed", ErrInvalidTyp, s)
 }
 
+func (t *BloodTyp) UnmarshalJSON(data []byte) error {
+	s := strings.Trim(string(data), `"`)
+	if pt, err := ParseBloodTyp(s); err != nil {
+		return err
+	} else {
+		*t = pt
+		return nil
+	}
+}
+
 func (b BloodTyp) String() string { return bts[b] }
 
 type SpeciesTyp int
@@ -80,6 +90,16 @@ func ParseSpeciesTyp(s string) (SpeciesTyp, error) {
 		return s, nil
 	}
 	return -1, fmt.Errorf("%w: species type of %s not allowed", ErrInvalidTyp, s)
+}
+
+func (t *SpeciesTyp) UnmarshalJSON(data []byte) error {
+	s := strings.Trim(string(data), `"`)
+	if pt, err := ParseSpeciesTyp(s); err != nil {
+		return err
+	} else {
+		*t = pt
+		return nil
+	}
 }
 
 func (s SpeciesTyp) String() string { return sta[s] }
